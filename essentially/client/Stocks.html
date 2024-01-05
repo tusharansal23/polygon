@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stocks Data</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+<table id="stocksTable">
+    <thead>
+        <tr>
+            <th>Symbol</th>
+            <th>Open</th>
+            <th>Current Price</th>
+            <th>Last Update Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Stock data will be added here dynamically -->
+    </tbody>
+</table>
+
+<script>
+    async function fetchStocksData() {
+        try {
+            const response = await fetch('http://localhost:5000/api/stocks');
+            if (!response.ok) {
+                throw new Error(`Failed to fetch stocks data. Status: ${response.status}`);
+            }
+
+            const stocksData = await response.json();
+            updateTable(stocksData);
+        } catch (error) {
+            console.error('Error fetching stocks data:', error.message);
+        }
+    }
+
+    function updateTable(stocksData) {
+        const tableBody = document.querySelector('#stocksTable tbody');
+        tableBody.innerHTML = '';
+
+        stocksData.forEach(stock => {
+            const row = tableBody.insertRow();
+            row.insertCell(0).textContent = stock.symbol;
+            row.insertCell(1).textContent = stock.open;
+            row.insertCell(2).textContent = stock.price;
+            row.insertCell(3).textContent = stock.lastUpdateTime;
+        });
+    }
+
+    // Fetch data every 1 second
+    setInterval(fetchStocksData, 1000);
+
+    // Initial fetch
+    fetchStocksData();
+</script>
+
+</body>
+</html>
